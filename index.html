@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Forecast</title>
+    <title>High-Tech Weather Forecast</title>
     <link rel="stylesheet" href="styles.css">
     <script defer src="script.js"></script>
+    <!-- Include Google Fonts for futuristic look -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Raleway:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Weather Forecast</h1>
-        <input type="text" id="locationInput" placeholder="Enter your location">
-        <button id="getWeatherBtn">Get Weather</button>
-        <button id="getCurrentLocationBtn">Get Current Location Weather</button>
-        <div id="weatherResult"></div>
+    <div class="container glass-effect">
+        <h1 class="neon-text">Weather Forecast</h1>
+        <input type="text" id="locationInput" class="futuristic-input" placeholder="Enter your location">
+        <div class="button-group">
+            <button id="getWeatherBtn" class="neon-button">Get Weather</button>
+            <button id="getCurrentLocationBtn" class="neon-button">Get Current Location Weather</button>
+        </div>
+        <div id="weatherResult" class="weather-result"></div>
     </div>
 </body>
 </html>
