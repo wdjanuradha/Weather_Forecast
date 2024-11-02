@@ -1,63 +1,47 @@
-// Automatically set current date in the "Age at the Date of" field
-window.onload = function() {
-    const today = new Date().toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
-    document.getElementById('calcDate').value = today;     // Set the current date by default
-};
+document.getElementById('getWeatherBtn').addEventListener('click', () => {
+    const location = document.getElementById('locationInput').value;
+    const apiKey = '2f7a7f5832a00c62097d5cdb1fd9e371'; // Replace with your OpenWeatherMap API key
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
 
-function calculateAge() {
-    const dobInput = document.getElementById("dob").value;
-    const calcDateInput = document.getElementById("calcDate").value;
+    fetchWeatherData(url);
+});
 
-    // Ensure both date inputs are filled
-    if (!dobInput || !calcDateInput) {
-        alert("Please select both dates!");
-        return;
+document.getElementById('getCurrentLocationBtn').addEventListener('click', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const { latitude, longitude } = position.coords;
+            const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+            fetchWeatherData(url);
+        }, () => {
+            document.getElementById('weatherResult').innerHTML = `<p>Unable to retrieve your location.</p>`;
+        });
+    } else {
+        document.getElementById('weatherResult').innerHTML = `<p>Geolocation is not supported by your browser.</p>`;
     }
+});
 
-    const dob = new Date(dobInput);
-    const calcDate = new Date(calcDateInput);
+function fetchWeatherData(url) {
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Location not found');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const { main, weather, name } = data;
+            const weatherDescription = weather[0].description;
+            const temperature = main.temp;
 
-    // Ensure the date of birth is before the calculation date
-    if (dob > calcDate) {
-        alert("Date of Birth should be before the Age at the Date of!");
-        return;
-    }
-
-    const diff = calcDate - dob;
-
-    // Calculate years, months, and days
-    let ageYears = calcDate.getFullYear() - dob.getFullYear();
-    let ageMonths = calcDate.getMonth() - dob.getMonth();
-    let ageDays = calcDate.getDate() - dob.getDate();
-
-    // Adjust if day or month is negative
-    if (ageDays < 0) {
-        ageMonths--;
-        ageDays += new Date(calcDate.getFullYear(), calcDate.getMonth(), 0).getDate();
-    }
-
-    if (ageMonths < 0) {
-        ageYears--;
-        ageMonths += 12;
-    }
-
-    // Calculate the total difference in other units of time
-    const totalMonths = ageYears * 12 + ageMonths;
-    const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const totalWeeks = Math.floor(totalDays / 7);
-    const totalHours = Math.floor(diff / (1000 * 60 * 60));
-    const totalMinutes = Math.floor(diff / (1000 * 60));
-    const totalSeconds = Math.floor(diff / 1000);
-
-    // Display the results
-    document.getElementById("age").innerHTML = `${ageYears} years ${ageMonths} months ${ageDays} days`;
-    document.getElementById("months").innerHTML = `${totalMonths} months ${totalDays % 30} days`;
-    document.getElementById("weeks").innerHTML = `${totalWeeks} weeks ${totalDays % 7} days`;
-    document.getElementById("days").innerHTML = `${totalDays} days`;
-    document.getElementById("hours").innerHTML = `${totalHours} hours`;
-    document.getElementById("minutes").innerHTML = `${totalMinutes} minutes`;
-    document.getElementById("seconds").innerHTML = `${totalSeconds} seconds`;
-
-    // Show the result section after calculation
-    document.getElementById('result-section').style.visibility = "visible";
+            document.getElementById('weatherResult').innerHTML = `
+                <h2>Weather in ${name}</h2>
+                <p>Temperature: ${temperature}°C</p>
+                <p>Condition: ${weatherDescription}</p>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('weatherResult').innerHTML = `<p>${error.message}</p>`;
+        });
 }
